@@ -38,25 +38,6 @@ jobs:
           Subject: 🚀 Nouveau push sur le dépôt « ${{ github.repository }} »
           MIME-Version: 1.0
           Content-Type: multipart/alternative; boundary="separator"
-
-          --separator
-          Content-Type: text/plain; charset="UTF-8"
-
-          Bonjour,
-
-          Un nouveau push a été effectué sur le dépôt « ${{ github.repository }} ».
-
-          Auteur : ${{ github.actor }}
-          Branche : ${{ github.ref_name }}
-          Message du commit :
-          ${{ github.event.head_commit.message }}
-
-          Lien : https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-
-          Bonne journée,
-          L'équipe GitHub Actions
-
-          --separator
           Content-Type: text/html; charset="UTF-8"
 
           <html>
