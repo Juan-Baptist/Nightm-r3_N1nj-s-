@@ -1,0 +1,44 @@
+name: Notify Members on Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install msmtp
+        run: |
+          sudo apt update
+          sudo apt install -y msmtp msmtp-mta
+
+      - name: Send email to members
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAILS_MEMBERS: ${{ secrets.EMAILS_MEMBERS }}
+        run: |
+          echo "account gmail
+          host smtp.gmail.com
+          port 587
+          auth on
+          user $SMTP_USERNAME
+          password $SMTP_PASSWORD
+          from $EMAIL_FROM
+          tls on
+          tls_trust_file /etc/ssl/certs/ca-certificates.crt
+          logfile ~/.msmtp.log
+
+          account default : gmail" > ~/.msmtprc
+
+          chmod 600 ~/.msmtprc
+
+          echo -e "Subject: 🚀 Nouveau push sur $GITHUB_REPOSITORY\n\nUn push a été effectué par ${{ github.actor }} sur ${{ github.ref_name }}.\nCommit: ${{ github.event.head_commit.message }}\nVoir: https://github.com/${{ github.repository }}/commit/${{ github.sha }}" > message.txt
+
+          IFS=',' read -ra ADDRS <<< "$EMAILS_MEMBERS"
+          for email in "${ADDRS[@]}"; do
+            msmtp "$email" < message.txt
+          done
