@@ -1,44 +1,83 @@
-name: Notify Members on Push
+name: 🚀 Notify on Push
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   notify:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Install msmtp
-        run: |
-          sudo apt update
-          sudo apt install -y msmtp msmtp-mta
+      - name: 📦 Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Send email to members
-        env:
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-          EMAILS_MEMBERS: ${{ secrets.EMAILS_MEMBERS }}
+      - name: 📥 Install msmtp
+        run: sudo apt-get update && sudo apt-get install -y msmtp
+
+      - name: 🛠️ Configure msmtp
         run: |
-          echo "account gmail
-          host smtp.gmail.com
-          port 587
-          auth on
-          user $SMTP_USERNAME
-          password $SMTP_PASSWORD
-          from $EMAIL_FROM
+          cat <<EOF > ~/.msmtprc
+          defaults
           tls on
+          tls_starttls on
           tls_trust_file /etc/ssl/certs/ca-certificates.crt
+          account default
+          host ${{ secrets.SMTP_HOST }}
+          port ${{ secrets.SMTP_PORT }}
+          auth on
+          user ${{ secrets.SMTP_USERNAME }}
+          password ${{ secrets.SMTP_PASSWORD }}
+          from ${{ secrets.EMAIL_FROM }}
           logfile ~/.msmtp.log
-
-          account default : gmail" > ~/.msmtprc
-
+          EOF
           chmod 600 ~/.msmtprc
 
-          echo -e "Subject: 🚀 Nouveau push sur $GITHUB_REPOSITORY\n\nUn push a été effectué par ${{ github.actor }} sur ${{ github.ref_name }}.\nCommit: ${{ github.event.head_commit.message }}\nVoir: https://github.com/${{ github.repository }}/commit/${{ github.sha }}" > message.txt
+      - name: 📝 Create email message
+        run: |
+          cat <<EOF > message.txt
+          Subject: 🚀 Nouveau push sur le dépôt « ${{ github.repository }} »
+          MIME-Version: 1.0
+          Content-Type: multipart/alternative; boundary="separator"
 
-          IFS=',' read -ra ADDRS <<< "$EMAILS_MEMBERS"
-          for email in "${ADDRS[@]}"; do
-            msmtp "$email" < message.txt
+          --separator
+          Content-Type: text/plain; charset="UTF-8"
+
+          Bonjour,
+
+          Un nouveau push a été effectué sur le dépôt « ${{ github.repository }} ».
+
+          Auteur : ${{ github.actor }}
+          Branche : ${{ github.ref_name }}
+          Message du commit :
+          ${{ github.event.head_commit.message }}
+
+          Lien : https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+
+          Bonne journée,
+          L'équipe GitHub Actions
+
+          --separator
+          Content-Type: text/html; charset="UTF-8"
+
+          <html>
+            <body style="font-family: Arial, sans-serif;">
+              <h2>🚀 Nouveau push sur <em>${{ github.repository }}</em></h2>
+              <p><strong>Auteur :</strong> ${{ github.actor }}<br>
+                 <strong>Branche :</strong> ${{ github.ref_name }}</p>
+              <p><strong>Message du commit :</strong><br>
+                 <em>${{ github.event.head_commit.message }}</em></p>
+              <p>🔗 <a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}">Voir le commit complet</a></p>
+              <p style="margin-top:20px;">Bonne journée,<br><em>L’équipe GitHub Actions</em></p>
+            </body>
+          </html>
+
+          --separator--
+          EOF
+
+      - name: 📤 Send email to members
+        run: |
+          IFS=',' read -ra ADDR <<< "${{ secrets.EMAILS_MEMBERS }}"
+          for email in "${ADDR[@]}"; do
+            cat message.txt | msmtp "$email"
+            echo "✅ Email envoyé à $email"
           done
