@@ -1,4 +1,4 @@
-name: 🚀 Notify on Push
+name: Notify on Push
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
       - name: 📝 Create email message
         run: |
           cat <<EOF > message.txt
-          Subject: 🚀 Nouveau push sur le dépôt « ${{ github.event.repository.name }} »
+          Subject: Nouveau push sur le dépôt « ${{ github.event.repository.name }} »
           MIME-Version: 1.0
           Content-Type: multipart/alternative; boundary="separator"
 
