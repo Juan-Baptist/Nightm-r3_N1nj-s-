@@ -24,35 +24,39 @@ jobs:
           EOF
           chmod 600 ~/.msmtprc
 
+      - name: 📦 Install msmtp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y msmtp
+
       - name: 📧 Préparer et envoyer le message
         run: |
           cat <<EOF > message.txt
           To: email@example.com
           Subject: 🚀 Nouveau push sur ${{ github.event.repository.name }}
           Content-Type: multipart/alternative; boundary="boundary42"
-        
-        
+          
           Content-Type: text/plain; charset="UTF-8"
-        
-          Nouveau push sur ${{ github.event.repository.name }}
-          Message : ${{ github.event.head_commit.message }}
-          Auteur : ${{ github.event.head_commit.author.name }}
+          
+            Nouveau push sur ${{ github.event.repository.name }}
+            Message : ${{ github.event.head_commit.message }}
+            Auteur : ${{ github.event.head_commit.author.name }}
           Date : ${{ github.event.head_commit.timestamp }}
-        
-          --boundary42
-          Content-Type: text/html; charset="UTF-8"
-        
-          <h2>🚀 Nouveau push sur <em>${{ github.event.repository.name }}</em></h2>
-          <p><strong>Message :</strong> ${{ github.event.head_commit.message }}</p>
-          <p><strong>Auteur :</strong> ${{ github.event.head_commit.author.name }}</p>
-          <p><strong>Date :</strong> ${{ github.event.head_commit.timestamp }}</p>
-         
-          --boundary42--
-          EOF
-        
-                  IFS="," read -ra ADDR <<< "${{ secrets.EMAILS_MEMBERS }}"
-                  for email in "${ADDR[@]}"; do
-                    sed -i "s/email@example.com/$email/" message.txt
-                    msmtp --from=default -t < message.txt
-                    sed -i "s/$email/email@example.com/" message.txt
-                  done
+          
+            --boundary42
+              Content-Type: text/html; charset="UTF-8"
+          
+            <h2>🚀 Nouveau push sur <em>${{ github.event.repository.name }}</em></h2>
+            <p><strong>Message :</strong> ${{ github.event.head_commit.message }}</p>
+            <p><strong>Auteur :</strong> ${{ github.event.head_commit.author.name }}</p>
+            <p><strong>Date :</strong> ${{ github.event.head_commit.timestamp }}</p>
+          
+            --boundary42--
+           EOF
+
+          IFS="," read -ra ADDR <<< "${{ secrets.EMAILS_MEMBERS }}"
+          for email in "${ADDR[@]}"; do
+            sed -i "s/email@example.com/$email/" message.txt
+            msmtp --from=default -t < message.txt
+            sed -i "s/$email/email@example.com/" message.txt
+          done
