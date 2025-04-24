@@ -1,0 +1,23 @@
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛠 Checkout
+        uses: actions/checkout@v3
+
+      - name: 📦 Installer msmtp
+        run: sudo apt-get update && sudo apt-get install -y msmtp
+
+      - name: 🔐 Setup secrets in msmtprc
+        run: |
+          cat <<EOF > ~/.msmtprc
+account default
+host ${{ secrets.SMTP_HOST }}
+port ${{ secrets.SMTP_PORT }}
+auth on
+user ${{ secrets.SMTP_USERNAME }}
+password ${{ secrets.SMTP_PASSWORD }}
+from ${{ secrets.EMAIL_FROM }}
+tls on
+EOF
+          chmod 600 ~/.msmtprc

@@ -9,6 +9,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      
+      - name: 📦 Installer msmtp
+        run: sudo apt-get update && sudo apt-get install -y msmtp
+
 
       - name: Setup secrets in msmtprc
         run: |
@@ -22,7 +26,7 @@ jobs:
           from ${{ secrets.EMAIL_FROM }}
           tls on
           EOF
-            chmod 600 ~/.msmtprc
+                 chmod 600 ~/.msmtprc
 
       - name: Préparer et envoyer le message
         run: |
