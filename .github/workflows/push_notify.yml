@@ -22,13 +22,13 @@ jobs:
           from ${{ secrets.EMAIL_FROM }}
           tls on
           EOF
-                chmod 600 ~/.msmtprc
-      
-            - name: 📧 Préparer et envoyer le message
-              run: |
-                IFS="," read -ra ADDR <<< "${{ secrets.EMAILS_MEMBERS }}"
-                for email in "${ADDR[@]}"; do
-                  cat <<EOF > message.txt
+            chmod 600 ~/.msmtprc
+
+      - name: 📧 Préparer et envoyer le message
+        run: |
+          IFS="," read -ra ADDR <<< "${{ secrets.EMAILS_MEMBERS }}"
+          for email in "${ADDR[@]}"; do
+          cat <<EOF > message.txt
           To: $email
           Subject: 🚀 Nouveau push sur ${{ github.event.repository.name }}
           Content-Type: multipart/alternative; boundary="boundary42"
