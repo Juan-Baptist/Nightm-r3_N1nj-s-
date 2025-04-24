@@ -13,7 +13,7 @@ jobs:
       - name: 🔐 Setup secrets in msmtprc
         run: |
           cat <<EOF > ~/.msmtprc
-      
+          account default
           host ${{ secrets.SMTP_HOST }}
           port ${{ secrets.SMTP_PORT }}
           auth on
