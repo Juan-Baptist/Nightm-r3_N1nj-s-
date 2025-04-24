@@ -32,7 +32,7 @@ jobs:
       - name: 📧 Préparer et envoyer le message
         run: |
           cat <<EOF > message.txt
-          To: email@example.com
+          To: ${{ secrets.EMAILS_MEMBERS }}
           Subject: 🚀 Nouveau push sur ${{ github.event.repository.name }}
           Content-Type: multipart/alternative; boundary="boundary42"
           
@@ -56,7 +56,7 @@ jobs:
 
           IFS="," read -ra ADDR <<< "${{ secrets.EMAILS_MEMBERS }}"
           for email in "${ADDR[@]}"; do
-            sed -i "s/email@example.com/$email/" message.txt
+            sed -i "s/${{ secrets.EMAILS_MEMBERS }}/$email/" message.txt
             msmtp --from=default -t < message.txt
             sed -i "s/$email/email@example.com/" message.txt
           done
