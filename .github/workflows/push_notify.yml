@@ -46,28 +46,28 @@ jobs:
 
           Un nouveau push a été effectué sur le dépôt « ${{ github.event.repository.name }} ».
 
-          Auteur : ${{ github.actor }}
-          Branche : ${{ github.ref_name }}
-          Message du commit :
+          Author : ${{ github.actor }}
+          Branch : ${{ github.ref_name }}
+          Commit message :
           ${{ github.event.head_commit.message }}
 
-          Lien : https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          Link : https://github.com/${{ github.repository }}/commit/${{ github.sha }}
 
-          Bonne journée,
-          L'équipe GitHub Actions
+          Best regards,  
+          Nightm@r3_N1nj@s Team
 
           --separator
           Content-Type: text/html; charset="UTF-8"
 
           <html>
             <body style="font-family: Arial, sans-serif;">
-              <h2>🚀 Nouveau push sur <em>${{ github.event.repository.name }}</em></h2>
-              <p><strong>Auteur :</strong> ${{ github.actor }}<br>
-                 <strong>Branche :</strong> ${{ github.ref_name }}</p>
-              <p><strong>Message du commit :</strong><br>
+              <h2>A new push was made to the repository <em>${{ github.event.repository.name }}</em></h2>
+              <p><strong>Author :</strong> ${{ github.actor }}<br>
+                 <strong>Branch :</strong> ${{ github.ref_name }}</p>
+              <p><strong>Commit message :</strong><br>
                  <em>${{ github.event.head_commit.message }}</em></p>
               <p>🔗 <a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}">Voir le commit complet</a></p>
-              <p style="margin-top:20px;">Bonne journée,<br><em>L'équipe GitHub Actions</em></p>
+              <p style="margin-top:20px;">Best regards,<br><em>Nightm@r3_N1nj@s Team</em></p>
             </body>
           </html>
 
